@@ -1,6 +1,6 @@
-# Kaggle Pipeline for **Kaggle TPS August 2022**
+# DataScience Project Template
 
-This is an **Open Source Python based pipeline for Kaggle tabular data competitions**. Although it is customized for Kaggle TPS August 2022, with limited code changes, this project can be used as a pipeline for any tabular data competition. This project includes APIs for most of the ML competition related tasks:
+ML related tasks:
 
 		- data processing
 		- visualization
@@ -42,49 +42,25 @@ This is an **Open Source Python based pipeline for Kaggle tabular data competiti
 ```
 
 ## Acknowledgment
-- I have borrowed the initial project structure and framework code from Kaggle Grandmaster, [Rob Mulla's](https://www.kaggle.com/robikscube) open sourced [code](https://github.com/RobMulla/kaggle-ieee-fraud-detection)
-- Lot of utility functions are from ["Approaching (Almost) Any Machine Learning Problem"](https://github.com/abhishekkrthakur/approachingalmost) by [Abhishek Thakur](https://www.kaggle.com/abhishek)
-- I used some feature selection related code from [SRK's](https://www.kaggle.com/sudalairajkumar) github repository
+- I have borrowed the initial project structure and framework code from [arnabbiswas1's](https://github.com/arnabbiswas1/kaggle_pipeline_tps_aug_22) open sourced code.
 
 ## Steps to execute:
 
 1. Clone the source code from github under <PROJECT_HOME> directory.
 
-        > git clone https://github.com/arnabbiswas1/kaggle_pipeline_tps_aug_22.git
-
-    This will create the following directory structure:
+        > git clone https://github.com/castillosebastian/mortality_analyses_covid.git
     
-        > <PROJECT_HOME>/kaggle_pipeline_tps_aug_22
+2. Create r and python (/usr/local/bin/python3) env:
+        
+        > renv::init()
+        > renv::use_python()
 
-2. Create conda env:
+3.  Download dataset 
 
-        > conda env create --file environment.yml
+        > HOME_DIR /src/scripts/data_processing/process_raw_data.R
 
-3. Go to `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22` and activate conda environment:
+5. Set the value of variable `HOME_DIR`, libraries, logger and much more at `<PROJECT_HOME>/main.R` 
 
-        > conda activate py_k
-
-3. Go to the raw data directory at `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/data/raw`. Download dataset from Kaggle (Kaggle API should be configured following [link](https://www.kaggle.com/docs/api#getting-started-installation-&-authentication)):
-
-        > kaggle competitions download -c tabular-playground-series-aug-2022
-
-4. Unzip the data:
-
-        > unzip tabular-playground-series-aug-2022.zip
-
-5. Set the value of variable `HOME_DIR` at `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/src/config/constants.py` with the absolute path of `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22`
-
-6. To process raw data into parquet format, go to `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22`. Execute the following:
-
-        > python -m src.scripts.data_processing.process_raw_data
-
-    This will create 3 parquet files under `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/data/processed` representing train, test and sample_submission CSVs
-
-7. To trigger feature engineering, go to `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22`. Execute the following:
-
-        > python -m src.scripts.data_processing.create_features
-
-   This will create a parquet file containing all the engineered features under `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/data/features`
 
 8. To train the baseline model with LGBM, `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22`. Execute the following:
 
@@ -97,10 +73,3 @@ Result of the experiment will be tracked at `<PROJECT_HOME>/kaggle_pipeline_tps_
 9. To submit the submission file to kaggle, go to `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/submissions`:
 
         > python -m submissions_1.py
-
-## Note:
-
-Following is needed for visualizing plots for optuna using plotly (i.e. plotly dependency):
-
-> jupyter labextension install jupyterlab-plotly@4.14.3
-

@@ -3,3 +3,4 @@ INFO  [2022-08-27 11:27:40] Info_message:basic reading formating
 INFO  [2022-08-27 11:27:40] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
 INFO  [2022-08-27 11:39:38] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_cv.R
 INFO  [2022-08-27 11:41:24] Info_message:training
+INFO  [2022-08-27 12:50:02] Info_message:start fe, dim: ~/R/experimet_template/exp/fe.R
