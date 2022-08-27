@@ -1,4 +1,5 @@
-pacman::p_load("tidyverse", "data.table", "dtplyr", "log4r")
+pacman::p_load("tidyverse", "data.table", "dtplyr", "log4r",
+               "lubridate")
 
 # logs
 my_logfile = "logfile.txt"
