@@ -450,6 +450,11 @@ fganancia_lgbm_meseta  <- function(probs, datos) {
 
 GVEZ <- 1 
 
+
+# ha trabajar aquí!!!!!!!!!!!!
+
+
+
 CanaritosImportancia  <- function( canaritos_ratio=0.2 ) {
   
   gc()
