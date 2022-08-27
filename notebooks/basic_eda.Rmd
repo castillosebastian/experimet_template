@@ -1,0 +1,19 @@
+---
+title: "basic EDA"
+author: "Claudio Sebastián Castillo"
+date: "`r format(Sys.Date(), '%d de %B de %Y') `"
+output:
+  html_document:
+    df_print: paged
+  html_notebook: default
+---
+
+```{r}
+source(paste0(here::here(), "/main.R"))
+source(paste0(HOME_DIR,"/src/scripts/data_processing/process_raw_data.R"))
+```
+
+```{r}
+skimr::skim(data)
+```
+
