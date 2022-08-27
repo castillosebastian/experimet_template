@@ -1,5 +1,7 @@
 # feauture engenieering
 
+# todo: recibir variable con nombre columna individuos: {{ind_col}}
+
 rm( list=ls() )  #remove all objects
 gc()             #garbage collection
 
@@ -58,9 +60,9 @@ CorregirCampoMes  <- function( pcampo, pmeses ) {
   tbl <- dataset[  ,  list( "v1" = shift( get(pcampo), 1, type="lag" ),
                             "v2" = shift( get(pcampo), 1, type="lead" )
   ), 
-  by=entity_col ]
+  by=paciente_id ]
   
-  tbl[ , entity_col := NULL ]
+  tbl[ , paciente_id := NULL ]
   tbl[ , promedio := rowMeans( tbl,  na.rm=TRUE ) ]
   
   dataset[ ,  
@@ -171,7 +173,7 @@ AgregarVariables  <- function( dataset ) {
   # #Aqui debe usted agregar sus propias nuevas variables
   # 
   # # Suma total de comisiones bancarias
-  # dataset[ , total_comisiones := sum(mcomisiones, na.rm = T), by = entity_col][]
+  # dataset[ , total_comisiones := sum(mcomisiones, na.rm = T), by = paciente_id][]
   # dataset[ , ctotal_comisiones := rowSums( cbind( ccomisiones_mantenimiento, ccomisiones_otras), na.rm=TRUE ) ]
   # dataset[ , ratio_comisiones :=  mcomisiones  / ctotal_comisiones  ]
   # dataset[ , ratio_totalcomisiones_antiguedad  := total_comisiones / cliente_antiguedad ] # top 13
@@ -186,7 +188,7 @@ AgregarVariables  <- function( dataset ) {
   # dataset[ , ratio_deuda_acumulada_cproductos_sobre_ctrx_q  := total_deuda_acumulada / ctrx_quarter_normalizado ]
   # 
   # # ahorro
-  # dataset[ , total_mcaja_ahorro := sum(mcaja_ahorro, na.rm = T), by = entity_col][]
+  # dataset[ , total_mcaja_ahorro := sum(mcaja_ahorro, na.rm = T), by = paciente_id][]
   # dataset[ , ratio_total_mcaja_ahorro_antiguedad  := total_mcaja_ahorro / cliente_antiguedad ]
   # dataset[ , ratio_total_mcaja_ahorro_ctrx_q := total_mcaja_ahorro / ctrx_quarter_normalizado ]
   # 
@@ -270,7 +272,7 @@ AgregarVariables  <- function( dataset ) {
 
 # temp ratios----
 
-#esta funcion supone que dataset esta ordenado por   <entity_col, foto_mes>
+#esta funcion supone que dataset esta ordenado por   <paciente_id, foto_mes>
 #calcula el lag y el delta lag
 
 Lags  <- function( cols, nlag, deltas )
@@ -279,7 +281,7 @@ Lags  <- function( cols, nlag, deltas )
   sufijo  <- paste0( "_lag", nlag )
   
   dataset[ , paste0( cols, sufijo) := shift(.SD, nlag, NA, "lag"), 
-           by= entity_col, 
+           by= paciente_id, 
            .SDcols= cols]
   
   #agrego los deltas de los lags, con un "for" nada elegante
@@ -296,8 +298,6 @@ Lags  <- function( cols, nlag, deltas )
   ReportarCampos( dataset )
 }
 
-
-#------------------------------------------------------------------------------
 #se calculan para los 6 meses previos el minimo, maximo y tendencia calculada con cuadrados minimos
 #la formula de calculo de la tendencia puede verse en https://stats.libretexts.org/Bookshelves/Introductory_Statistics/Book%3A_Introductory_Statistics_(Shafer_and_Zhang)/10%3A_Correlation_and_Regression/10.04%3A_The_Least_Squares_Regression_Line
 #para la maxíma velocidad esta funcion esta escrita en lenguaje C, Autor: Gustavo Denicolay
@@ -387,7 +387,7 @@ TendenciaYmuchomas  <- function( dataset, cols, ventana=6, tendencia=TRUE, minim
   
   #creo el vector_desde que indica cada ventana
   #de esta forma se acelera el procesamiento ya que lo hago una sola vez
-  vector_ids   <- dataset$entity_col
+  vector_ids   <- dataset$paciente_id
   
   vector_desde  <- seq( -ventana_regresion+2,  nrow(dataset)-ventana_regresion+1 )
   vector_desde[ 1:ventana_regresion ]  <-  1
@@ -456,24 +456,25 @@ CanaritosImportancia  <- function( canaritos_ratio=0.2 ) {
   
   ReportarCampos( dataset )
   
-  dataset[ , clase01:= ifelse( clase_ternaria =="CONTINUA", 0, 1 ) ]
+  # OJO variables de clase
+  dataset[ , clase01:= ifelse( resultado == 0, 0, 1 ) ]
   
   for( i  in 1:(ncol(dataset)*canaritos_ratio))  dataset[ , paste0("canarito", i ) :=  runif( nrow(dataset))]
   
-  campos_buenos  <- setdiff( colnames(dataset), c("clase_ternaria","clase01" ) )
+  campos_buenos  <- setdiff( colnames(dataset), c("resultado","clase01" ) )
   
   azar  <- runif( nrow(dataset) )
   dataset[ , entrenamiento := foto_mes>= 202001 &  foto_mes<= 202010 &  foto_mes!=202006 & ( clase01==1 | azar < 0.10 ) ]
   
   dtrain  <- lgb.Dataset( data=    data.matrix(  dataset[ entrenamiento==TRUE, campos_buenos, with=FALSE]),
                           label=   dataset[ entrenamiento==TRUE, clase01],
-                          weight=  dataset[ entrenamiento==TRUE, ifelse(clase_ternaria=="BAJA+2", 1.0000001, 1.0)],
+                          weight=  dataset[ entrenamiento==TRUE, ifelse(resultado==1, 1.0000001, 1.0)],
                           free_raw_data= FALSE
   )
   
   dvalid  <- lgb.Dataset( data=    data.matrix(  dataset[ foto_mes==202011, campos_buenos, with=FALSE]),
                           label=   dataset[ foto_mes==202011, clase01],
-                          weight=  dataset[ foto_mes==202011, ifelse(clase_ternaria=="BAJA+2", 1.0000001, 1.0)],
+                          weight=  dataset[ foto_mes==202011, ifelse(resultado==1, 1.0000001, 1.0)],
                           free_raw_data= FALSE
   )
   
@@ -514,10 +515,10 @@ CanaritosImportancia  <- function( canaritos_ratio=0.2 ) {
   
   GVEZ  <<- GVEZ + 1
   
-  umbral  <- tb_importancia[ Feature %like% "canarito", median(pos) + 2*sd(pos) ]  #Atencion corto en la mediana mas DOS desvios!!
+  umbral  <- tb_importancia[ Feature %like% "canarito", median(pos) + 2* sd(pos) ]  #Atencion corto en la mediana mas DOS desvios!!
   
   col_utiles  <- tb_importancia[ pos < umbral & !( Feature %like% "canarito"),  Feature ]
-  col_utiles  <-  unique( c( col_utiles,  c("entity_col","foto_mes","clase_ternaria","mes") ) )
+  col_utiles  <-  unique( c( col_utiles,  c("paciente_id","foto_mes","clase_ternaria","mes") ) )
   col_inutiles  <- setdiff( colnames(dataset), col_utiles )
   
   dataset[  ,  (col_inutiles) := NULL ]
@@ -625,7 +626,7 @@ if(stringr::str_sub(PARAM$files$input$dentrada, -3) == "csv") {
 }
 
 ## correcciones 1:nulos,NA,drift,agregomes,variablesmanuales----  
-#ordeno el dataset por <entity_col, foto_mes> para poder hacer lags
+#ordeno el dataset por <paciente_id, foto_mes> para poder hacer lags
 
 setorderv( dataset, PARAM$const$campos_sort )
 
@@ -640,4 +641,94 @@ if( PARAM$corregir == "ClaudioCastillo" )  CorregirClaudioCastillo( dataset )  #
 if( PARAM$corregir == "AsignarNA" )  CorregirNA( dataset )  #esta linea debe ir DESPUES de  DummiesNA
 
 if( PARAM$variablesmanuales )  AgregarVariables( dataset )
+
+## correcciones 2:lag,randomforest,otros----  
+
+cols_lagueables  <- copy( setdiff( colnames(dataset), PARAM$const$campos_fijos ) )
+
+for( i in 1:length( PARAM$tendenciaYmuchomas$correr ) ) {
+  
+  if( PARAM$tendenciaYmuchomas$correr[i] )   {
+    
+    #veo si tengo que ir agregando variables
+    
+    if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
+    
+    cols_lagueables  <- intersect( colnames(dataset), cols_lagueables )
+    
+    TendenciaYmuchomas( dataset, 
+                        cols= cols_lagueables,
+                        ventana=   PARAM$tendenciaYmuchomas$ventana[i],
+                        tendencia= PARAM$tendenciaYmuchomas$tendencia[i],
+                        minimo=    PARAM$tendenciaYmuchomas$minimo[i],
+                        maximo=    PARAM$tendenciaYmuchomas$maximo[i],
+                        promedio=  PARAM$tendenciaYmuchomas$promedio[i],
+                        ratioavg=  PARAM$tendenciaYmuchomas$ratioavg[i],
+                        ratiomax=  PARAM$tendenciaYmuchomas$ratiomax[i]     )
+    
+    #elimino las variables poco importantes, para hacer lugar a las importantes
+    #if( PARAM$tendenciaYmuchomas$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio= unlist(PARAM$tendenciaYmuchomas$canaritos[ i ]) )
+    
+  }
+}
+
+
+for( i in 1:length( PARAM$lags$correr ) ) {
+  
+  if( PARAM$lags$correr[i] )
+  {
+    #veo si tengo que ir agregando variables
+    if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
+    
+    cols_lagueables  <- intersect( colnames(dataset), cols_lagueables )
+    Lags( cols_lagueables, 
+          PARAM$lags$lag[i], 
+          PARAM$lags$delta[ i ] )   #calculo los lags de orden  i
+    
+    #elimino las variables poco importantes, para hacer lugar a las importantes
+    if( PARAM$lags$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio= unlist(PARAM$lags$canaritos[ i ]) )
+  }
+}
+
+
+if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
+
+if( PARAM$rankeador ) #agrego los rankings
+{
+  if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
+  
+  cols_lagueables  <- intersect( colnames(dataset), cols_lagueables )
+  setorderv( dataset, PARAM$const$campos_rsort )
+  Rankeador( cols_lagueables )
+  setorderv( dataset, PARAM$const$campos_sort )
+}
+
+
+if( PARAM$randomforest$correr )   AgregaVarRandomForest( PARAM$randomforest$num.trees,
+                                                         PARAM$randomforest$max.depth,
+                                                         PARAM$randomforest$min.node.size,
+                                                         PARAM$randomforest$mtry
+)
+
+if( PARAM$canaritos_final > 0  )   CanaritosImportancia( canaritos_ratio= PARAM$canaritos_final )
+
+
+
+
+#dejo la clase como ultimo campo
+nuevo_orden  <- c( setdiff( colnames( dataset ) , PARAM$const$clase ) , PARAM$const$clase )
+setcolorder( dataset, nuevo_orden )
+
+
+#Grabo el dataset    https://www.youtube.com/watch?v=66CP-pq7Cx0
+fwrite( dataset,
+        paste0( PARAM$files$output ),
+        logical01= TRUE,
+        sep= "," )
+
+
+
+# grabo catalogo   ------------------------------------------------------------
+# es lo ultimo que hago, indica que llegue a generar la salida
+#no todos los archivos generados pasan al catalogo
 

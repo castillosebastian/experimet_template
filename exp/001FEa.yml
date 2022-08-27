@@ -39,14 +39,14 @@ param:
 
 
   tendenciaYmuchomas:  #todos FALSE
-    correr:    [  TRUE, TRUE, TRUE, TRUE ]   #tendencias a correr, es lo que controla y se impone al resto
+    correr:    [  TRUE, FALSE, FALSE, FALSE ]   #tendencias a correr, es lo que controla y se impone al resto
     ventana:   [    6,   3,    9,     12 ]   #tamaño de la ventana, solo se corren las que dicen  correr=TRUE
-    tendencia: [  TRUE, TRUE, TRUE, TRUE ]   #pendiente de la recta ajustada por cuadrados minimos
-    minimo:    [  TRUE, TRUE, TRUE, TRUE ]   #minimo de la ventana
-    maximo:    [  TRUE, TRUE, TRUE, TRUE ]   #maximo de la ventana
-    promedio:  [  TRUE, TRUE, TRUE, TRUE ]   #promedio de la ventana
-    ratioavg:  [  TRUE, TRUE, TRUE, TRUE ]   #valor sobre el promedio de la ventana
-    ratiomax:  [  TRUE, TRUE, TRUE, TRUE ]   #valor sobre el maximo de la ventana
+    tendencia: [  TRUE, FALSE, FALSE, FALSE ]   #pendiente de la recta ajustada por cuadrados minimos
+    minimo:    [  FALSE, FALSE, FALSE, FALSE ]   #minimo de la ventana
+    maximo:    [  FALSE, FALSE, FALSE, FALSE ]   #maximo de la ventana
+    promedio:  [  FALSE, FALSE, FALSE, FALSE ]   #promedio de la ventana
+    ratioavg:  [  FALSE, FALSE, FALSE, FALSE ]   #valor sobre el promedio de la ventana
+    ratiomax:  [  FALSE, FALSE, FALSE, FALSE ]   #valor sobre el maximo de la ventana
     canaritos: [   0.0,  0.0,  0.0,  0.1 ]   #porcentaje de canaritos asesinos, del total de columnas del dataset, 0 indica NO reducir campos por canaritos
 
 # crea variables {0,1}  con las hojas de un random forest, ATENCION que explota !!
@@ -72,11 +72,11 @@ param:
       dsalida: "paquete_premium_ext.csv.gz"
 
   const:
-    clase:         "clase_ternaria"
+    clase:         "resultado"
     futuro:        [ 202101 ]
     campos_sort:   [ "paciente_id", "foto_mes" ]   #por donde hago el sort inicial
     campos_rsort:  [ "foto_mes", "paciente_id" ]   #por donde hago el sort inicial
-    campos_fijos:  [ "paciente_id", "foto_mes", "mes", "clase_ternaria" ]
+    campos_fijos:  [ "paciente_id", "foto_mes", "mes", "resultado" ]
 
 
 environment:
