@@ -4,3 +4,24 @@ INFO  [2022-08-26 23:42:45] Info_message:reading dataset
 INFO  [2022-08-26 23:42:45] Info_message:basic reading formating
 INFO  [2022-08-26 23:47:23] Info_message:reading dataset
 INFO  [2022-08-26 23:47:23] Info_message:basic reading formating
+INFO  [2022-08-27 07:15:58] Info_message:reading dataset
+INFO  [2022-08-27 07:15:58] Info_message:basic reading formating
+INFO  [2022-08-27 07:16:20] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 07:51:31] Info_message:reading dataset
+INFO  [2022-08-27 07:51:31] Info_message:basic reading formating
+INFO  [2022-08-27 07:51:31] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 08:09:19] Info_message:reading dataset
+INFO  [2022-08-27 08:09:20] Info_message:basic reading formating
+INFO  [2022-08-27 08:09:20] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 08:15:40] Info_message:reading dataset
+INFO  [2022-08-27 08:15:40] Info_message:basic reading formating
+INFO  [2022-08-27 08:15:40] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 08:26:22] Info_message:reading dataset
+INFO  [2022-08-27 08:26:22] Info_message:basic reading formating
+INFO  [2022-08-27 08:26:22] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 08:32:43] Info_message:reading dataset
+INFO  [2022-08-27 08:32:43] Info_message:basic reading formating
+INFO  [2022-08-27 08:32:44] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
+INFO  [2022-08-27 11:20:08] Info_message:reading dataset
+INFO  [2022-08-27 11:20:09] Info_message:basic reading formating
+INFO  [2022-08-27 11:20:09] Info_message:start fe, dim: 8311~/R/experimet_template/src/fe/fe_covid.RInfo_message:start fe, dim: 47~/R/experimet_template/src/fe/fe_covid.R
