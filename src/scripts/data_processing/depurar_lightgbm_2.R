@@ -6,11 +6,9 @@ log4r_info(paste0("train ligthgbm: outofthebox ", rstudioapi::getActiveDocumentC
 
 source(paste0(here::here(), "/src/config/constants.R"))
 
-dataset = readRDS(paste0(RAW_DATA_DIR, "/covid_utn2022.rds"))
+#dataset = readRDS(paste0(RAW_DATA_DIR, "/covid_utn2022.rds"))
 #dataset = readRDS(paste0(PROCESSED_DATA_DIR, "/dataset.rds"))
-
-
-data = data %>% ungroup()
+data = fread(paste0(PROCESSED_DATA_DIR, "/datset_growth3.csv.gz"))
 
 # Parametros
 columna_clase <- "resultado"
@@ -31,8 +29,8 @@ dsLearn <- data
 dsLearn <- as.data.table(dsLearn)
 
 #paso la clase a binaria que tome valores {0,1}  enteros
-dsLearn[ , clase01 := ifelse( resultado=="muerte", 1L, 0L) ]
-
+dsLearn[ , clase01 := resultado ]
+dsLearn$resultado = NULL
 #los campos que se van a utilizar
 campos_buenos  <- setdiff( colnames(dsLearn), c(columna_clase,"clase01") )
 

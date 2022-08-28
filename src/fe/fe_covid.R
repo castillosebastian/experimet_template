@@ -23,6 +23,7 @@ gc()             #garbage collection
 
 source(paste0(here::here(), "/main.R"))
 source(paste0(HOME_DIR,"/src/scripts/data_processing/process_raw_data.R"))
+#dataset = readRDS(paste0(PROCESSED_DATA_DIR, "/dataset.rds"))
 
 # tools
 ReportarCampos  <- function( dataset )

@@ -15,7 +15,7 @@ experiment:
   tags: [ "austero" ]
   description: "Lags1,delta1, tendencia, media"
 
-  requires: [ "DT0001" ]
+  requires: [ "covid_utn2022.rds" ]
 
 param:
 
@@ -44,15 +44,15 @@ param:
 
 
   tendenciaYmuchomas:  #todos FALSE
-    correr:    [  TRUE, FALSE, FALSE, FALSE ]   #tendencias a correr, es lo que controla y se impone al resto
-    ventana:   [    6,   3,    9,     12 ]   #tamaño de la ventana, solo se corren las que dicen  correr=TRUE
-    tendencia: [  TRUE, FALSE, FALSE, FALSE ]   #pendiente de la recta ajustada por cuadrados minimos
+    correr:    [  TRUE, TRUE, TRUE, FALSE ]   #tendencias a correr, es lo que controla y se impone al resto
+    ventana:   [    2,   3,    6,     12 ]   #tamaño de la ventana, solo se corren las que dicen  correr=TRUE
+    tendencia: [  TRUE, TRUE, TRUE, FALSE ]   #pendiente de la recta ajustada por cuadrados minimos
     minimo:    [  FALSE, FALSE, FALSE, FALSE ]   #minimo de la ventana
     maximo:    [  FALSE, FALSE, FALSE, FALSE ]   #maximo de la ventana
     promedio:  [  FALSE, FALSE, FALSE, FALSE ]   #promedio de la ventana
-    ratioavg:  [  FALSE, FALSE, FALSE, FALSE ]   #valor sobre el promedio de la ventana
+    ratioavg:  [  TRUE, TRUE, TRUE, FALSE ]   #valor sobre el promedio de la ventana
     ratiomax:  [  FALSE, FALSE, FALSE, FALSE ]   #valor sobre el maximo de la ventana
-    canaritos: [   0.0,  0.0,  0.0,  0.1 ]   #porcentaje de canaritos asesinos, del total de columnas del dataset, 0 indica NO reducir campos por canaritos
+    canaritos: [   0.0,  0.0,  0.1,  0.0 ]   #porcentaje de canaritos asesinos, del total de columnas del dataset, 0 indica NO reducir campos por canaritos
 
 # crea variables {0,1}  con las hojas de un random forest, ATENCION que explota !!
 
@@ -72,9 +72,9 @@ param:
 
   files:
     input:
-      dentrada: [ "dataset.rds" ]
+      dentrada: [ "covid_utn2022.rds" ]
     output:
-      dsalida: "paquete_premium_ext.csv.gz"
+      dsalida: "datset_growth3.csv.gz"
 
   const:
     clase:          "resultado"

@@ -156,6 +156,7 @@ exp_start  <- function( exp_name= NA, deletevm= TRUE, repo_dir= HOME_DIR, exp_di
   system( paste0( "./", shell_script ) )
 }
 
+
 # otras funciones: analizar para implementar----
 
 exp_iniciar  <- function( exp_nombre = NA){
@@ -173,7 +174,7 @@ exp_iniciar  <- function( exp_nombre = NA){
   EXP  <<- yaml::read_yaml( paste0(EXP_DIR,"/", args[1], ".yml") )
   EXP$experiment$name  <<- args[1]
   PARAM  <<- EXP$param
-
+  
   #escribo al log que comenzo el SCRIPT
   linea  <- paste0( EXP$experiment$name,
                     "\t",

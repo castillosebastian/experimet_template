@@ -1,9 +1,7 @@
 # feauture engenieering
 
-# todo: recibir variable con nombre columna individuos: {{ind_col}}
-
-rm( list=ls() )  #remove all objects
-gc()             #garbage collection
+#rm( list=ls() )  #remove all objects
+#gc()             #garbage collection
 
 require("data.table")
 require("Rcpp")
@@ -100,8 +98,8 @@ AgregarVariables  <- function( dataset ) {
   gc()
   # #INICIO de la seccion donde se deben hacer cambios con variables nuevas
   
-  dataset[  , arm_x_inotropicos  := arm * inotropicos ]
-  dataset[  , arm_sobre_inotropicos  := arm / inotropicos ]
+  dataset[  , arm_x_inotropicos  := as.numeric(arm) * as.numeric(inotropicos) ]
+  dataset[  , arm_sobre_inotropicos  := as.numeric(arm) / as.numeric(inotropicos) ]
    
   # #creo un ctr_quarter que tenga en cuenta cuando los clientes hace 3 menos meses que estan
   # dataset[  , ctrx_quarter_normalizado := ctrx_quarter ]
@@ -275,8 +273,8 @@ AgregarVariables  <- function( dataset ) {
 #esta funcion supone que dataset esta ordenado por   <paciente_id, foto_mes>
 #calcula el lag y el delta lag
 
-Lags  <- function( cols, nlag, deltas )
-{
+Lags  <- function( cols, nlag, deltas ) {
+  
   gc()
   sufijo  <- paste0( "_lag", nlag )
   
@@ -450,38 +448,39 @@ fganancia_lgbm_meseta  <- function(probs, datos) {
 
 GVEZ <- 1 
 
-
-# ha trabajar aquí!!!!!!!!!!!!
-
-
-
-CanaritosImportancia  <- function( canaritos_ratio=0.2 ) {
+CanaritosImportancia  <- function( canaritos_ratio = 0.2, 
+                                   año_mes_excludios_train = PARAM$canaritos$meses_excluidos, 
+                                   valido_en =  PARAM$canaritos$meses_validacion ) {
+  
+  # Canaritos es una funciòn muy importante porque limpia el dataset de variables sin valor. Para ello, 
+  # entrena un modelo GBDT, evalùa sus resultados y eliminar todas aquellas columnas con menor importancia que 
+  # la "capa de canaritos", equivalente a una serie de columnas con valores puramente random.
+  # canaritos ratio = porcentaje de canaritos (columnas con valores aleatorias o ruido) respecto del total de columnas del dataset
+  # año_mes_excluidos = el modelo excluye dichos meses del entrenamiento
   
   gc()
   
   ReportarCampos( dataset )
   
-  # OJO variables de clase
-  dataset[ , clase01:= ifelse( resultado == 0, 0, 1 ) ]
+  dataset[ , clase01 :=  get(PARAM$const$clase)]
   
-  for( i  in 1:(ncol(dataset)*canaritos_ratio))  dataset[ , paste0("canarito", i ) :=  runif( nrow(dataset))]
+  for( i  in 1:(ncol(dataset)*canaritos_ratio))  dataset[ , paste0("canarito", i ) :=  runif( nrow(dataset))] # la magia de variables random
   
-  campos_buenos  <- setdiff( colnames(dataset), c("resultado","clase01" ) )
+  campos_buenos  <- setdiff( colnames(dataset), c(PARAM$const$clase,"clase01" ) )
   
   azar  <- runif( nrow(dataset) )
-  dataset[ , entrenamiento :=  ( clase01==1 | azar < 0.10 ) ]
+  
+  dataset[ , entrenamiento := !(foto_mes %in% PARAM$canaritos_params$meses_excluidos) & ( clase01==1 | azar < 0.10 ) ]
   
   dtrain  <- lgb.Dataset( data=    data.matrix(  dataset[ entrenamiento==TRUE, campos_buenos, with=FALSE]),
                           label=   dataset[ entrenamiento==TRUE, clase01],
-                          weight=  dataset[ entrenamiento==TRUE, ifelse(resultado==1, 1.0000001, 1.0)],
-                          free_raw_data= FALSE
-  )
+                          weight=  dataset[ entrenamiento==TRUE, ifelse(resultado == 1, 1.0000001, 1.0)],
+                          free_raw_data= FALSE  )
   
-  dvalid  <- lgb.Dataset( data=    data.matrix(  dataset[ foto_mes==202107, campos_buenos, with=FALSE]), # ojo muy manual
-                          label=   dataset[ foto_mes==202107, clase01],
-                          weight=  dataset[ foto_mes==202107, ifelse(resultado==1, 1.0000001, 1.0)],
-                          free_raw_data= FALSE
-  )
+  dvalid  <- lgb.Dataset( data=    data.matrix(  dataset[ foto_mes==PARAM$canaritos_params$meses_validacion, campos_buenos, with=FALSE]), # ojo muy manual
+                          label=   dataset[ foto_mes==PARAM$canaritos_params$meses_validacion, clase01],
+                          weight=  dataset[ foto_mes==PARAM$canaritos_params$meses_validacion, ifelse(resultado == 1, 1.0000001, 1.0)],
+                          free_raw_data= FALSE  )
   
   
   param <- list( objective= "binary",
@@ -515,15 +514,15 @@ CanaritosImportancia  <- function( canaritos_ratio=0.2 ) {
   tb_importancia[  , pos := .I ]
   
   fwrite( tb_importancia, 
-          file= paste0( "impo_", GVEZ ,".txt"),
+          file= paste0(EXP_DIR, "/postcanaritos", EXP$experiment$name, "_impo_", GVEZ ,".txt"),
           sep= "\t" )
   
   GVEZ  <<- GVEZ + 1
   
-  umbral  <- tb_importancia[ Feature %like% "canarito", median(pos) + 2* sd(pos) ]  #Atencion corto en la mediana mas DOS desvios!!
+  umbral  <- tb_importancia[ Feature %like% "canarito", median(pos) + 2 * sd(pos) ]  # Atencion corto en la mediana mas DOS desvios!!
   
   col_utiles  <- tb_importancia[ pos < umbral & !( Feature %like% "canarito"),  Feature ]
-  col_utiles  <-  unique( c( col_utiles,  c("paciente_id","foto_mes","clase_ternaria","mes") ) )
+  col_utiles  <-  unique( c( col_utiles,  PARAM$const$campos_fijos ) )
   col_inutiles  <- setdiff( colnames(dataset), col_utiles )
   
   dataset[  ,  (col_inutiles) := NULL ]
@@ -556,19 +555,21 @@ AgregaVarRandomForest  <- function( num.trees, max.depth, min.node.size, mtry) {
   gc()
   
   ReportarCampos( dataset )
-  dataset[ , clase01:= ifelse( clase_ternaria=="CONTINUA", 0, 1 ) ]
   
-  campos_buenos  <- setdiff( colnames(dataset), c("clase_ternaria" ) )
+  dataset[ , clase01 :=  get(PARAM$const$clase)]
+  
+  campos_buenos  <- setdiff( colnames(dataset), PARAM$const$clase)
   
   dataset_rf  <- copy( dataset[ , campos_buenos, with=FALSE] )
   azar  <- runif( nrow(dataset_rf) )
-  dataset_rf[ , entrenamiento := as.integer( foto_mes>= 202001 &  foto_mes<= 202010 &  foto_mes!=202006 & ( clase01==1 | azar < 0.10 )) ]
+  dataset_rf[ , entrenamiento := !(foto_mes %in% PARAM$canaritos_params$meses_excluidos) & ( clase01==1 | azar < 0.10 ) ]
   
-  #imputo los nulos, ya que ranger no acepta nulos
-  #Leo Breiman, ¿por que le temias a los nulos?
+  #imputo los nulos, ya que ranger no acepta nulos   #Leo Breiman, ¿por que le temias a los nulos?
+  dataset_rf[, names(dataset_rf) := lapply(.SD, as.numeric)]
   dataset_rf  <- na.roughfix( dataset_rf )
   
-  campos_buenos  <- setdiff( colnames(dataset_rf), c("clase_ternaria","entrenamiento" ) )
+  campos_buenos  <- setdiff( colnames(dataset_rf), c(PARAM$const$clase,"entrenamiento" ) )
+  
   modelo  <- ranger( formula= "clase01 ~ .",
                      data=  dataset_rf[ entrenamiento==1L, campos_buenos, with=FALSE  ] ,
                      classification= TRUE,
@@ -576,8 +577,7 @@ AgregaVarRandomForest  <- function( num.trees, max.depth, min.node.size, mtry) {
                      num.trees=     num.trees,
                      max.depth=     max.depth,
                      min.node.size= min.node.size,
-                     mtry=          mtry
-  )
+                     mtry=          mtry)
   
   rfhojas  <- predict( object= modelo, 
                        data= dataset_rf[ , campos_buenos, with=FALSE ],
@@ -677,7 +677,6 @@ for( i in 1:length( PARAM$tendenciaYmuchomas$correr ) ) {
   }
 }
 
-
 for( i in 1:length( PARAM$lags$correr ) ) {
   
   if( PARAM$lags$correr[i] )
@@ -695,11 +694,9 @@ for( i in 1:length( PARAM$lags$correr ) ) {
   }
 }
 
-
 if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
 
-if( PARAM$rankeador ) #agrego los rankings
-{
+if( PARAM$rankeador ) {
   if( PARAM$acumulavars )  cols_lagueables  <- setdiff( colnames(dataset), PARAM$const$campos_fijos )
   
   cols_lagueables  <- intersect( colnames(dataset), cols_lagueables )
@@ -708,30 +705,22 @@ if( PARAM$rankeador ) #agrego los rankings
   setorderv( dataset, PARAM$const$campos_sort )
 }
 
-
 if( PARAM$randomforest$correr )   AgregaVarRandomForest( PARAM$randomforest$num.trees,
                                                          PARAM$randomforest$max.depth,
                                                          PARAM$randomforest$min.node.size,
-                                                         PARAM$randomforest$mtry
-)
+                                                         PARAM$randomforest$mtry )
 
 if( PARAM$canaritos_final > 0  )   CanaritosImportancia( canaritos_ratio= PARAM$canaritos_final )
-
-
-
 
 #dejo la clase como ultimo campo
 nuevo_orden  <- c( setdiff( colnames( dataset ) , PARAM$const$clase ) , PARAM$const$clase )
 setcolorder( dataset, nuevo_orden )
 
-
 #Grabo el dataset    https://www.youtube.com/watch?v=66CP-pq7Cx0
 fwrite( dataset,
-        paste0( PARAM$files$output ),
+        paste0(PROCESSED_DATA_DIR, "/", PARAM$files$output ),
         logical01= TRUE,
         sep= "," )
-
-
 
 # grabo catalogo   ------------------------------------------------------------
 # es lo ultimo que hago, indica que llegue a generar la salida
