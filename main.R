@@ -156,7 +156,6 @@ exp_start  <- function( exp_name= NA, deletevm= TRUE, repo_dir= HOME_DIR, exp_di
   system( paste0( "./", shell_script ) )
 }
 
-
 # otras funciones: analizar para implementar----
 
 exp_iniciar  <- function( exp_nombre = NA){
