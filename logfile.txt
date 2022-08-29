@@ -1,3 +1,60 @@
 INFO  [2022-08-28 20:06:22] Info_message:start experiment, dim: 002FEa	20220828 200622	SCRIPT_START
 
 INFO  [2022-08-28 20:13:27] Info_message:training
+INFO  [2022-08-29 16:24:21] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:27:15] Info_message:training
+INFO  [2022-08-29 16:27:32] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:27:32] Info_message:training
+INFO  [2022-08-29 16:28:39] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:28:39] Info_message:training
+INFO  [2022-08-29 16:31:57] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:31:57] Info_message:training
+INFO  [2022-08-29 16:32:13] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:32:13] Info_message:training
+INFO  [2022-08-29 16:38:40] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:38:41] Info_message:training
+INFO  [2022-08-29 16:39:00] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:39:00] Info_message:training
+INFO  [2022-08-29 16:39:48] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:39:49] Info_message:training
+INFO  [2022-08-29 16:40:03] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:40:03] Info_message:training
+INFO  [2022-08-29 16:43:54] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:43:54] Info_message:training
+INFO  [2022-08-29 16:44:16] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:44:16] Info_message:training
+INFO  [2022-08-29 18:27:10] Info_message:start experiment, dim: 001FEa	20220829 182710	SCRIPT_START
+
+INFO  [2022-08-29 18:42:20] Info_message:start experiment, dim: 001FEa	20220829 184220	SCRIPT_START
+
+INFO  [2022-08-29 18:43:53] Info_message:start experiment, dim: 001FEa	20220829 184353	SCRIPT_START
+
+INFO  [2022-08-29 18:44:49] Info_message:start experiment, dim: 001FEa	20220829 184449	SCRIPT_START
+
+INFO  [2022-08-29 18:51:49] Info_message:start experiment, dim: 001FEa	20220829 185149	SCRIPT_START
+
+INFO  [2022-08-29 18:52:42] Info_message:start experiment, dim: 001FEa	20220829 185242	SCRIPT_START
+
+INFO  [2022-08-29 18:53:44] Info_message:start experiment, dim: 001FEa	20220829 185344	SCRIPT_START
+
+INFO  [2022-08-29 18:54:42] Info_message:start experiment, dim: 001FEa	20220829 185442	SCRIPT_START
+
+INFO  [2022-08-29 18:54:42] Info_message:start experiment
+INFO  [2022-08-29 18:55:51] Info_message:end experiment, dim: 8311Info_message:end experiment, dim: 92
+INFO  [2022-08-29 18:58:29] Info_message:end experiment, dim: 92.~/R/experimet_template/src/fe/fe.R
+INFO  [2022-08-29 19:23:55] Info_message:start experiment, dim: 001FEa	20220829 192355	SCRIPT_START
+
+INFO  [2022-08-29 19:25:34] Info_message:start experiment, dim: 001FEa	20220829 192534	SCRIPT_START
+
+INFO  [2022-08-29 19:27:05] Info_message:start experiment, dim: 001FEa	20220829 192704	SCRIPT_START
+
+INFO  [2022-08-29 19:27:21] Info_message:start experiment, dim: 001FEa	20220829 192721	SCRIPT_START
+
+INFO  [2022-08-29 19:29:19] Info_message:start experiment, dim: 001FEa	20220829 192919	SCRIPT_START
+
+INFO  [2022-08-29 19:29:23] Info_message:start experiment
+INFO  [2022-08-29 19:30:19] Info_message:end experiment. Dataset de salida con columnas = : 90.Rscript=
+INFO  [2022-08-29 19:39:01] Info_message:start experiment, dim: 001FEa	20220829 193901	SCRIPT_START
+
+INFO  [2022-08-29 19:39:01] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas:98
+INFO  [2022-08-29 19:40:11] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas:93. Rscript=src/fe/fe.R

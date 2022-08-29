@@ -167,3 +167,10 @@ INFO  [2022-08-27 11:20:09] Info_message:start fe, dim: 8311~/R/experimet_templa
 ""
 INFO  [2022-08-28 10:54:05] Info_message:reading dataset
 INFO  [2022-08-28 10:54:05] Info_message:basic reading formating
+"INFO  [2022-08-28 20:06:22] Info_message:start experiment, dim: 002FEa	20220828 200622	SCRIPT_START"
+""
+INFO  [2022-08-28 20:13:27] Info_message:training
+INFO  [2022-08-29 16:24:21] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:27:15] Info_message:training
+INFO  [2022-08-29 16:27:32] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
+INFO  [2022-08-29 16:27:32] Info_message:training

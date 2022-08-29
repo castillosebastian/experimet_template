@@ -79,7 +79,8 @@ modelocv  <- lgb.cv( data= dtrain,
                      verbose= -100
 )
 
-modelocv$record_evals$valid[[p_parametro_optimizar]]$eval
+modelocv$record_evals$valid$auc
+
 
 unlist(modelocv$record_evals$valid[[p_parametro_optimizar]]$eval)[ modelocv$best_iter ]
 

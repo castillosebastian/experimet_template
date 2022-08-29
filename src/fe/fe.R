@@ -1,7 +1,7 @@
 # feauture engenieering
 
-#rm( list=ls() )  #remove all objects
-#gc()             #garbage collection
+# rm( list=ls() )  #remove all objects
+# gc()             #garbage collection
 
 require("data.table")
 require("Rcpp")
@@ -610,7 +610,6 @@ AgregaVarRandomForest  <- function( num.trees, max.depth, min.node.size, mtry) {
 
 # RUN fe-----
 #Aqui empieza el programa
-
 ## cargo el dataset----
 # cambiar si entrada es csv, rds, agregar si otros
 
@@ -629,6 +628,8 @@ if(stringr::str_sub(PARAM$files$input$dentrada, -3) == "csv") {
   log4r_error(paste0("no se reconoce extensión del archivo. Definir funcion de lectura en ", 
                      rstudioapi::getActiveDocumentContext()$path))
 }
+
+log4r_info(paste0(EXP$experiment$name, ": start experiment. Dataset de entrada con filas = ", dim(dataset)[1], ", columnas = " , dim(dataset)[2]))
 
 ## correcciones 1:nulos,NA,drift,agregomes,variablesmanuales----  
 #ordeno el dataset por <paciente_id, foto_mes> para poder hacer lags
@@ -716,13 +717,12 @@ if( PARAM$canaritos_final > 0  )   CanaritosImportancia( canaritos_ratio= PARAM$
 nuevo_orden  <- c( setdiff( colnames( dataset ) , PARAM$const$clase ) , PARAM$const$clase )
 setcolorder( dataset, nuevo_orden )
 
-#Grabo el dataset    https://www.youtube.com/watch?v=66CP-pq7Cx0
+# Grabo el dataset  ----
 fwrite( dataset,
         paste0(PROCESSED_DATA_DIR, "/", PARAM$files$output ),
         logical01= TRUE,
         sep= "," )
 
-# grabo catalogo   ------------------------------------------------------------
-# es lo ultimo que hago, indica que llegue a generar la salida
-#no todos los archivos generados pasan al catalogo
+log4r_info(paste0(EXP$experiment$name, ": start experiment. Dataset de entrada con filas = ", dim(dataset)[1], 
+                  ", columnas = " , dim(dataset)[2], ". Rscript=", EXP$experiment$script ))
 
