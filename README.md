@@ -73,3 +73,10 @@ Result of the experiment will be tracked at `<PROJECT_HOME>/kaggle_pipeline_tps_
 9. To submit the submission file to kaggle, go to `<PROJECT_HOME>/kaggle_pipeline_tps_aug_22/submissions`:
 
         > python -m submissions_1.py
+        
+        
+        
+10. Important Bib
+
+- custom metric functions: [1](https://towardsdatascience.com/custom-loss-functions-for-gradient-boosting-f79c1b40466d),[2](https://github.com/manifoldai/mf-eng-public/blob/master/notebooks/custom_loss_lightgbm.ipynb),  
+- hpyer parameters optimization grid: [1](https://github.com/Microsoft/LightGBM/issues/695) 
