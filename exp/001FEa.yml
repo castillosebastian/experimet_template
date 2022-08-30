@@ -8,7 +8,7 @@ googlecloud:
 
 experiment:
 
-  script: "src/completo/z913_FE_UTN.r"
+  script: "src/fe/fe.R"
   restart: FALSE
   name: "exp"
   type: "FeatureEngineering"
@@ -74,7 +74,7 @@ param:
     input:
       dentrada: [ "dataset.rds" ]
     output:
-      dsalida: "paquete_premium_ext.csv.gz"
+      dsalida: "dataset_growth4.csv.gz"
 
   const:
     clase:          "resultado"
@@ -83,8 +83,6 @@ param:
     campos_rsort:    [ "foto_mes", "paciente_id" ]   #por donde hago el sort inicial
     campos_fijos:    [ "paciente_id", "foto_mes", "mes", "resultado" ]
 
-
 environment:
-  repo_dir: "~/labo/"
-  exp_dir:  "~/buckets/b1/exp/"
-  catalog:  "catalogo.txt"
+  repo_dir: "~/experiment_template/"
+  exp_dir:  "~/experiment_template/exp/"
