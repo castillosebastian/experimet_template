@@ -1,0 +1,4 @@
+Todo:
+- notebook de evaluación modelo: ejecemplo clasificación binaria https://rpubs.com/awanindra01/lightgbm
+- eda tiene que responder preguntas fundamentales de diseño del experimento: variables drif, distribuciones-na-null-varimportantes para feature engineergin , temporalidad, etc
+- 

@@ -78,5 +78,6 @@ Result of the experiment will be tracked at `<PROJECT_HOME>/kaggle_pipeline_tps_
         
 10. Important Bib
 
-- custom metric functions: [1](https://towardsdatascience.com/custom-loss-functions-for-gradient-boosting-f79c1b40466d),[2](https://github.com/manifoldai/mf-eng-public/blob/master/notebooks/custom_loss_lightgbm.ipynb),  
+- custom metric functions: [1](https://towardsdatascience.com/custom-loss-functions-for-gradient-boosting-f79c1b40466d),[2](https://github.com/manifoldai/mf-eng-public/blob/master/notebooks/custom_loss_lightgbm.ipynb),
+- metric: [binary_logloss](https://towardsdatascience.com/intuition-behind-log-loss-score-4e0c9979680a#:~:text=Log%2Dloss%20is%20indicative%20of,is%20the%20log%2Dloss%20value.)
 - hpyer parameters optimization grid: [1](https://github.com/Microsoft/LightGBM/issues/695) 
