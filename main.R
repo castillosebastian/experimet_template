@@ -1,5 +1,9 @@
-pacman::p_load("tidyverse", "data.table", "dtplyr", "log4r",
-               "lubridate", "Rcpp", "yaml", "rlist")
+# principal
+if (!require("pacman")) install.packages("pacman")
+pacman::p_load(tidyverse, data.table, dtplyr, log4r,
+               lubridate, Rcpp, yaml, rlist, ggplot2, 
+               ROCR, methods, Matrix, caret)
+options(scipen = 999)
 
 # logs
 my_logfile = "logfile.txt"
@@ -31,14 +35,17 @@ exp_start  <- function( exp_nombre = NA) {
   }
 
   #el primer parametro tiene el nombre del  yml
-  EXP  <<- yaml::read_yaml( paste0(EXP_DIR,"/", args[1], ".yml") )
-  EXP$experiment$name  <<- args[1]
-  PARAM  <<- EXP$param
+  EXP  <- yaml::read_yaml( paste0(EXP_DIR,"/", args[1], ".yml") )
+  EXP$experiment$name  <- args[1]
+  PARAM  <- EXP$param
   
-  source(EXP$experiment$script)
+  source(EXP$experiment$script, local = TRUE)
   
 }
 
 
+# 
+# my_logfile <- as_tibble(readLines(my_logfile))
+# fwrite(my_logfile, paste0(LOGS_DIR, "/logs.txt"), append = T, sep= "\t")
 
 

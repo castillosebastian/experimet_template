@@ -448,9 +448,7 @@ fganancia_lgbm_meseta  <- function(probs, datos) {
 
 GVEZ <- 1 
 
-CanaritosImportancia  <- function( canaritos_ratio = 0.2, 
-                                   año_mes_excludios_train = PARAM$canaritos$meses_excluidos, 
-                                   valido_en =  PARAM$canaritos$meses_validacion ) {
+CanaritosImportancia  <- function( canaritos_ratio = 0.2, año_mes_excludios_train = NULL, valido_en =  NULL) {
   
   # Canaritos es una funciòn muy importante porque limpia el dataset de variables sin valor. Para ello, 
   # entrena un modelo GBDT, evalùa sus resultados y eliminar todas aquellas columnas con menor importancia que 
@@ -488,7 +486,7 @@ CanaritosImportancia  <- function( canaritos_ratio = 0.2,
                  first_metric_only= TRUE,
                  boost_from_average= TRUE,
                  feature_pre_filter= FALSE,
-                 verbosity= -100,
+                 verbosity= -0,
                  seed= 999983,
                  max_depth=  -1,         # -1 significa no limitar,  por ahora lo dejo fijo
                  min_gain_to_split= 0.0, #por ahora, lo dejo fijo
@@ -508,13 +506,13 @@ CanaritosImportancia  <- function( canaritos_ratio = 0.2,
                         valids= list( valid= dvalid ),
                         eval= fganancia_lgbm_meseta,
                         param= param,
-                        verbose= -100 )
+                        verbose= -0 )
   
   tb_importancia  <- lgb.importance( model= modelo )
   tb_importancia[  , pos := .I ]
   
   fwrite( tb_importancia, 
-          file= paste0(EXP_DIR, "/postcanaritos", EXP$experiment$name, "_impo_", GVEZ ,".txt"),
+          file= paste0(EXP_DIR, "/postcanaritos", GVEZ,"_",EXP$experiment$name, "_featuregain.txt"),
           sep= "\t" )
   
   GVEZ  <<- GVEZ + 1
@@ -609,7 +607,8 @@ AgregaVarRandomForest  <- function( num.trees, max.depth, min.node.size, mtry) {
 }
 
 # RUN fe-----
-#Aqui empieza el programa
+# Aqui empieza el programa
+
 ## cargo el dataset----
 # cambiar si entrada es csv, rds, agregar si otros
 
@@ -631,12 +630,13 @@ if(stringr::str_sub(PARAM$files$input$dentrada, -3) == "csv") {
 
 log4r_info(paste0(EXP$experiment$name, ": start experiment. Dataset de entrada con filas = ", dim(dataset)[1], ", columnas = " , dim(dataset)[2]))
 
+## opero sobre timestamp----
+AgregarMes( dataset )  
+
 ## correcciones 1:nulos,NA,drift,agregomes,variablesmanuales----  
 #ordeno el dataset por <paciente_id, foto_mes> para poder hacer lags
 
 setorderv( dataset, PARAM$const$campos_sort )
-
-AgregarMes( dataset )  #agrego el mes del año
 
 if( length( PARAM$variablesdrift) > 0 )    DriftEliminar( dataset, PARAM$variablesdrift )
 
@@ -673,8 +673,9 @@ for( i in 1:length( PARAM$tendenciaYmuchomas$correr ) ) {
                         ratiomax=  PARAM$tendenciaYmuchomas$ratiomax[i]     )
     
     #elimino las variables poco importantes, para hacer lugar a las importantes
-    #if( PARAM$tendenciaYmuchomas$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio= unlist(PARAM$tendenciaYmuchomas$canaritos[ i ]) )
-    
+    if( PARAM$tendenciaYmuchomas$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio = unlist(PARAM$tendenciaYmuchomas$canaritos[i], 
+                                                                                                      año_mes_excludios_train = PARAM$canaritos$meses_excluidos, 
+                                                                                                      valido_en =  PARAM$canaritos$meses_validacion))
   }
 }
 
@@ -691,7 +692,7 @@ for( i in 1:length( PARAM$lags$correr ) ) {
           PARAM$lags$delta[ i ] )   #calculo los lags de orden  i
     
     #elimino las variables poco importantes, para hacer lugar a las importantes
-    if( PARAM$lags$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio= unlist(PARAM$lags$canaritos[ i ]) )
+    if( PARAM$lags$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio= unlist(PARAM$lags$canaritos[ i ] ))
   }
 }
 
@@ -711,7 +712,7 @@ if( PARAM$randomforest$correr )   AgregaVarRandomForest( PARAM$randomforest$num.
                                                          PARAM$randomforest$min.node.size,
                                                          PARAM$randomforest$mtry )
 
-if( PARAM$canaritos_final > 0  )   CanaritosImportancia( canaritos_ratio= PARAM$canaritos_final )
+if( PARAM$canaritos_final > 0  )   CanaritosImportancia( canaritos_ratio= PARAM$canaritos_final)
 
 #dejo la clase como ultimo campo
 nuevo_orden  <- c( setdiff( colnames( dataset ) , PARAM$const$clase ) , PARAM$const$clase )
@@ -723,6 +724,6 @@ fwrite( dataset,
         logical01= TRUE,
         sep= "," )
 
-log4r_info(paste0(EXP$experiment$name, ": start experiment. Dataset de entrada con filas = ", dim(dataset)[1], 
+log4r_info(paste0(EXP$experiment$name, ": end experiment. Dataset de entrada con filas = ", dim(dataset)[1], 
                   ", columnas = " , dim(dataset)[2], ". Rscript=", EXP$experiment$script ))
 

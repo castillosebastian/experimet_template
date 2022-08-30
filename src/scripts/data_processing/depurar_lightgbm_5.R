@@ -15,14 +15,12 @@ columna_clase <- "resultado"
 
 p_objective <- "binary" 
 
+#p_parametro_optimizar <- "auc"
 p_parametro_optimizar <- "average_precision"  # cambiar por lo que estemos estimando. Si es un problema de clasificacion, cambiar por "auc"
                                 # Consultar lista en https://lightgbm.readthedocs.io/en/latest/Parameters.html#metric-parameters
 
-
-
+ksemilla_azar = 7778
 # training----
-
-log4r_info("training")
 
 dsLearn <- data
 
@@ -31,6 +29,7 @@ dsLearn <- as.data.table(dsLearn)
 #paso la clase a binaria que tome valores {0,1}  enteros
 dsLearn[ , clase01 := resultado ]
 dsLearn$resultado = NULL
+
 #los campos que se van a utilizar
 campos_buenos  <- setdiff( colnames(dsLearn), c(columna_clase,"clase01") )
 
@@ -83,5 +82,3 @@ modelocv$record_evals$valid[[p_parametro_optimizar]]$eval
 unlist(modelocv$record_evals$valid[[p_parametro_optimizar]]$eval)[ modelocv$best_iter ]
 
 # save log----
-my_logfile <- as_tibble(readLines(my_logfile))
-fwrite(my_logfile, paste0(LOGS_DIR, "/logs.txt"), append = T, sep= "\t")

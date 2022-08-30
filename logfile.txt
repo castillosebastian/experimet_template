@@ -58,3 +58,12 @@ INFO  [2022-08-29 19:39:01] Info_message:start experiment, dim: 001FEa	20220829 
 
 INFO  [2022-08-29 19:39:01] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas:98
 INFO  [2022-08-29 19:40:11] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas:93. Rscript=src/fe/fe.R
+INFO  [2022-08-30 11:32:46] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 98
+INFO  [2022-08-30 11:36:39] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 103. Rscript=src/fe/fe.R
+INFO  [2022-08-30 11:37:35] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 98
+INFO  [2022-08-30 11:42:16] Info_message:001FEa: end experiment. Dataset de entrada con filas = 8311, columnas = 100. Rscript=src/fe/fe.R
+INFO  [2022-08-30 12:04:09] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 98
+INFO  [2022-08-30 12:15:40] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 98
+INFO  [2022-08-30 12:19:50] Info_message:001FEa: end experiment. Dataset de entrada con filas = 8311, columnas = 95. Rscript=src/fe/fe.R
+INFO  [2022-08-30 12:50:57] Info_message:001FEa: start experiment. Dataset de entrada con filas = 8311, columnas = 98
+INFO  [2022-08-30 12:54:54] Info_message:001FEa: end experiment. Dataset de entrada con filas = 8311, columnas = 100. Rscript=src/fe/fe.R

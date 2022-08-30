@@ -7,22 +7,9 @@
 #  3. dataset de  train_final  donde se va a entrenar el modelo final una vez que se tengan los mejores hiperparametros de la Bayesian Optimization
 
 
-#Necesita para correr en Google Cloud
-# 64 GB de memoria RAM
-#300 GB de espacio en el disco local
-#  8 vCPU
-
-
-#limpio la memoria
-rm( list=ls() )  #remove all objects
-gc()             #garbage collection
-
 require("data.table")
 
-source(paste0(here::here(), "/main.R"))
-
-
-#particiona en el dataset una seccion  del yaml ------
+# particiona en el dataset una seccion  del yaml ----
 
 aplicar_particion  <- function( seccion ) {
   
