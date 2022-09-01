@@ -1,0 +1,268 @@
+---
+title: "SVM"
+author: "Área de Planificación Gestión y Estadística"
+date: "1/9/2022"
+output: html_document
+params:
+  variable_factor_svm:
+    label: "SVM target feature"
+    input: text
+    value: "sd"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(paste0(here::here(), "/main.R"))
+SVM = T
+AI = F
+
+variable_factor_svm = params$variable_factor_svm
+```
+
+# Máquinas de Soporte Vectorial
+
+<!-- El algoritmo de las SVM a partir del producto escalar de dos vectores multidimensionales, busca una familia de hiperplanos que sepa ren los grupos. La función que define este producto escalar es denominada kernel y la misma puede ser lineal, polinómica, radial o sigmoidal. -->
+
+<!-- Muy importante estandarizar datos -->
+
+<!-- La mayor debilidad radica en que es necesaria una buena función kernel; es decir, se necesitan metodologías eficientes para definir los parámetros de inicialización de las SVM. -->
+
+
+## Datos
+
+```{r, eval=(SVM | AI)}
+# Bibliograf
+
+datos <- fread( paste0(PROCESSED_DATA_DIR,   "/dataset_growth4.csv.gz") ) 
+
+datos$resultado = as.factor(datos$resultado)
+
+# Convierto variables predictoras tipo factor a numeric
+dat_f = datos %>% select(resultado) %>% as_tibble()
+
+
+dat_all =  datos %>%
+  select(-resultado) %>%
+  mutate_if(is.factor, as.numeric) %>% as_tibble()
+
+# Matriz escalada--------------------------------------------------
+# dat_all <- dat_all %>% 
+#   select_if(is.numeric) %>% 
+#   scale(center = T, scale = T)
+
+datos = dat_f %>% bind_cols(dat_all)
+
+
+datos = datos %>% 
+  select(-progr_imagerad_perc, progr_image_rad)                     
+
+
+datos[datos < 0] <- NA   
+datos = na.omit(datos)
+
+#datos = na.omit(datos)
+
+# x=c(rnorm (50,5,2),rnorm(50,8,1.5),rnorm(50,1,1.2))
+# y=c(abs(rnorm(50,5,2)),rnorm(50,8,1.5),rnorm(50,1,1.2))
+# Grupo=as.factor(c(rep("A",50),rep("B",50),rep("C",50)))
+# datos =data.frame(x,y,Grupo)
+
+# # Programar la elección de otros kernel???!!!!
+# kernel = "radial" 
+
+# resumente datos
+str(datos)
+```
+
+## Grafico datos
+
+```{r, eval=(SVM | AI)}
+datos %>% 
+  ggplot( aes(x = variable_factor_svm, y = ..count.., fill = datos$resultado)) +
+  geom_bar() 
+```
+
+```{r, eval=(SVM | AI)}
+# Índices observaciones de entrenamiento
+set.seed(123)
+train <- createDataPartition(y = datos$resultado, p = 0.8, list = FALSE, times = 1)
+# Datos entrenamiento
+datos_train <- datos[train, ]
+datos_test <- datos[-train, ]
+dim(datos_train)
+dim(datos_test)
+
+```
+
+## Busqueda de mejor hiperparametro C (coste) y Entrenamiento del Modelo con kernel lineal
+
+<!-- A la hora de ajustar un support vector classifier, es importante tener en cuenta que el hiperparámetro C (cost) controla el equilibrio bias-varianza y la capacidad predictiva del modelo, ya que determina la severidad permitida respecto a las violaciones sobre el margen. En otras palabras, necesitamos fijar un margen de separación entre observaciones a priori. Por ello es recomendable evaluar distintos valores del mismo mediante validación cruzada y escoger el valor óptimo. -->
+
+<!-- Obtendremos un valor de coste óptimo mediante validación cruzada utilizando la función tune() del paquete e1071 -->
+
+
+```{r, eval=(SVM | AI)}
+library(e1071)
+temp = datos_train %>% select(-resultado)
+set.seed(325)
+tuning <- e1071::tune(svm, train.x = temp,  train.y = datos_train$resultado,
+               kernel = "linear",
+               ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 15, 20)),
+               scale = TRUE) # parametro para escalar los predictores
+```
+
+```{r, eval=(SVM | AI)}
+summary(tuning)
+```
+
+### Mejor modelo según hiperparametro
+
+```{r, eval=(SVM | AI)}
+modelo_svc <- tuning$best.model
+summary(modelo_svc)
+```
+
+```{r, eval=(SVM | AI)}
+# Muestra de 50 de los 345
+head(modelo_svc$index)
+```
+
+## Predicciones del Modelo
+
+```{r, eval=(SVM | AI)}
+temp = datos_test %>% select(-variable_factor_svm)
+predicciones = predict(modelo_svc, temp)
+table(prediccion = predicciones, real = datos_test$resultado)
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test mal clasificadas:", 
+      100 * mean(datos_test$resultado != predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test bien clasificadas:", 
+      100 * mean(datos_test$resultado == predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+## Busqueda de mejor hiperparametro C (coste) y Entrenamiento del Modelo con kernel polynomial
+
+```{r, eval=(SVM | AI)}
+temp = datos_train %>% select(-variable_factor_svm)
+set.seed(325)
+tuning <- tune(svm, train.x = temp,  train.y = datos_train$resultado,
+               kernel = "polynomial",
+               ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 15, 20)),
+               scale = TRUE)
+```
+
+```{r, eval=(SVM | AI)}
+summary(tuning)
+```
+
+### Mejor modelo según hiperparametro
+
+```{r, eval=(SVM | AI)}
+modelo_svc <- tuning$best.model
+summary(modelo_svc)
+```
+
+## Predicciones del Modelo
+
+```{r, eval=(SVM | AI)}
+temp = datos_test %>% select(-variable_factor_svm)
+predicciones = predict(modelo_svc, temp)
+table(prediccion = predicciones, real = datos_test$resultado)
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test mal clasificadas:", 
+      100 * mean(datos_test$resultado != predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test bien clasificadas:", 
+      100 * mean(datos_test$resultado == predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+## Busqueda de mejor hiperparametro C (coste) y Entrenamiento del Modelo con kernel sigmoid
+
+```{r, eval=(SVM | AI)}
+temp = datos_train %>% select(-variable_factor_svm)
+set.seed(325)
+tuning <- tune(svm, train.x = temp,  train.y = datos_train$resultado,
+               kernel = "sigmoid",
+               ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 15, 20)),
+               scale = TRUE)
+```
+
+### Mejor modelo según hiperparametro
+
+```{r, eval=(SVM | AI)}
+modelo_svc <- tuning$best.model
+summary(modelo_svc)
+```
+
+## Predicciones del Modelo
+
+```{r, eval=(SVM | AI)}
+temp = datos_test %>% select(-variable_factor_svm)
+predicciones = predict(modelo_svc, temp)
+table(prediccion = predicciones, real = datos_test$resultado)
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test mal clasificadas:", 
+      100 * mean(datos_test$resultado != predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test bien clasificadas:", 
+      100 * mean(datos_test$resultado == predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+## Busqueda de mejor hiperparametro C (coste) y Entrenamiento del Modelo con kernel radial 
+
+```{r, eval=(SVM | AI)}
+temp = datos_train %>% select(-variable_factor_svm)
+set.seed(325)
+tuning <- tune(svm, train.x = temp,  train.y = datos_train$resultado,
+               kernel = "radial",
+               ranges = list(cost = c(0.001, 0.01, 0.1, 1, 5, 10, 15, 20)),
+               scale = TRUE)
+```
+
+### Mejor modelo según hiperparametro
+
+```{r, eval=(SVM | AI)}
+modelo_svc <- tuning$best.model
+summary(modelo_svc)
+```
+
+## Predicciones del Modelo
+
+```{r, eval=(SVM | AI)}
+temp = datos_test %>% select(-variable_factor_svm)
+predicciones = predict(modelo_svc, temp)
+table(prediccion = predicciones, real = datos_test$resultado)
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test mal clasificadas:", 
+      100 * mean(datos_test$resultado != predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+```{r, eval=(SVM | AI)}
+paste("Observaciones de test bien clasificadas:", 
+      100 * mean(datos_test$resultado == predicciones) %>% 
+        round(digits = 4), "%")
+```
+
+\pagebreak

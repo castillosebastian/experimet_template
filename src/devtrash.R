@@ -1,4 +1,6 @@
 dataset = fread(paste0(PROCESSED_DATA_DIR, "/dataset_growth4.csv.gz"))
+source(paste0(here::here(), "/main.R"))
+
 exp_nombre = "001TSa"
 #leo los parametros con los que se llamo al script  R
 if( is.na(exp_nombre ) ) {
