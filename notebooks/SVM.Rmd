@@ -54,7 +54,7 @@ datos = dat_f %>% bind_cols(dat_all)
 
 
 datos = datos %>% 
-  select(-progr_imagerad_perc, progr_image_rad)                     
+  select(-progr_imagerad_perc, -ldh)                     
 
 
 datos[datos < 0] <- NA   
@@ -130,7 +130,7 @@ head(modelo_svc$index)
 ## Predicciones del Modelo
 
 ```{r, eval=(SVM | AI)}
-temp = datos_test %>% select(-variable_factor_svm)
+temp = datos_test %>% select(-resultado)
 predicciones = predict(modelo_svc, temp)
 table(prediccion = predicciones, real = datos_test$resultado)
 ```
@@ -140,6 +140,8 @@ paste("Observaciones de test mal clasificadas:",
       100 * mean(datos_test$resultado != predicciones) %>% 
         round(digits = 4), "%")
 ```
+
+
 
 ```{r, eval=(SVM | AI)}
 paste("Observaciones de test bien clasificadas:", 
