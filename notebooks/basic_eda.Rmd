@@ -16,4 +16,122 @@ source(paste0(HOME_DIR,"/src/scripts/data_processing/process_raw_data.R"))
 ```{r}
 skimr::skim(data)
 ```
+# data formating
+
+
+```{r}
+date_cols <- c("fini_sintomas", "finternacion", "fdiag_covid")
+setDT(data)[, (date_cols) := lapply(.SD, lubridate::ymd), .SDcols = date_cols]
+setDT(data)[, (date_cols) := lapply(.SD, format, "%Y%m"), .SDcols = date_cols]
+setDT(data)[, (date_cols) := lapply(.SD, as.numeric), .SDcols = date_cols]
+```
+
+```{r}
+data[ , resultado := as.factor(resultado)]
+```
+
+```{r}
+data %>% 
+  #sample_n(100) %>% 
+  visdat::vis_dat()
+```
+```{r}
+data %>% 
+  #sample_n(100) %>% 
+  visdat::vis_miss()
+```
+
+```{r}
+data %>%
+  inspectdf::inspect_na() %>% 
+  inspectdf::show_plot()
+```
+```{r}
+data[, c("metodo_otro","no_neumonia_cual", "progr_imagerad_perc"):=NULL]  # remove two columns
+```
+
+
+
+```{r}
+data %>% 
+  naniar::gg_miss_upset()
+```
+
+```{r}
+data %>% 
+  select_if(is.numeric) %>% 
+  visdat::vis_cor()
+```
+
+```{r}
+data %>%
+  select_if(~!is.numeric(.)) %>%
+  inspectdf::inspect_cat() %>% 
+  inspectdf::show_plot()
+```
+
+# Null Model
+
+```{r}
+#https://www.tidymodels.org/start/recipes/
+
+set.seed(314)
+
+split <- initial_split(data = data, strata = resultado, prop = 0.8)
+train <- training(split)
+test  <- testing(split)
+
+folds <- train %>% rsample::vfold_cv(v = 4,repeats = 2, strata = resultado)
+
+recipe <- recipe(resultado ~ ., data = train) %>%
+  update_role(codigo_paciente, new_role = "ID") %>% 
+  # step_medianimpute(all_predictors())
+  # step_date(finternacion, features = c("dow", "month")) %>%               
+  # step_holiday(finternacion, 
+  #              holidays = timeDate::listHolidays("Argentina"),
+  #              keep_original_cols = FALSE) %>%
+  step_dummy(all_nominal_predictors()) %>% 
+  #step_impute_linear(all_predictors()) %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  step_zv(all_predictors())
+  
+```
+
+```{r}
+lr_mod <- 
+  logistic_reg() %>% 
+  set_engine("glm")
+```
+
+```{r}
+wflow <- 
+  workflow() %>% 
+  add_model(lr_mod) %>% 
+  add_recipe(recipe)
+```
+
+```{r}
+fit <- 
+  wflow %>% 
+  fit(data = train)
+```
+```{r}
+fit %>% 
+  extract_fit_parsnip() %>% 
+  tidy()
+```
+```{r}
+predict(fit, test)
+```
+```{r}
+aug <- augment(fit, test)
+
+# The data look like: 
+aug %>% select(resultado, .pred_class)
+```
+```{r}
+aug %>% 
+  roc_curve(truth = resultado, .pred_class) %>% 
+  autoplot()
+```
 

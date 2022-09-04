@@ -174,3 +174,39 @@ INFO  [2022-08-29 16:24:21] Info_message:train ligthgbm: outofthebox ~/R/experim
 INFO  [2022-08-29 16:27:15] Info_message:training
 INFO  [2022-08-29 16:27:32] Info_message:train ligthgbm: outofthebox ~/R/experimet_template/src/scripts/data_processing/depurar_lightgbm_2.R
 INFO  [2022-08-29 16:27:32] Info_message:training
+INFO  [2022-08-26 23:45:00] Info_message:reading dataset
+INFO  [2022-08-26 23:45:00] Info_message:basic reading formating
+INFO  [2022-08-26 23:49:34] Info_message:reading dataset
+INFO  [2022-08-26 23:49:34] Info_message:basic reading formating
+INFO  [2022-09-04 10:01:53] Info_message:reading dataset
+INFO  [2022-09-04 10:01:53] Info_message:basic reading formating
+INFO  [2022-08-26 23:45:00] Info_message:reading dataset
+INFO  [2022-08-26 23:45:00] Info_message:basic reading formating
+INFO  [2022-08-26 23:49:34] Info_message:reading dataset
+INFO  [2022-08-26 23:49:34] Info_message:basic reading formating
+INFO  [2022-09-04 10:01:53] Info_message:reading dataset
+INFO  [2022-09-04 10:01:53] Info_message:basic reading formating
+INFO  [2022-09-04 10:52:34] Info_message:reading dataset
+INFO  [2022-09-04 10:52:34] Info_message:basic reading formating
+INFO  [2022-08-26 23:45:00] Info_message:reading dataset
+INFO  [2022-08-26 23:45:00] Info_message:basic reading formating
+INFO  [2022-08-26 23:49:34] Info_message:reading dataset
+INFO  [2022-08-26 23:49:34] Info_message:basic reading formating
+INFO  [2022-09-04 10:01:53] Info_message:reading dataset
+INFO  [2022-09-04 10:01:53] Info_message:basic reading formating
+INFO  [2022-09-04 10:52:34] Info_message:reading dataset
+INFO  [2022-09-04 10:52:34] Info_message:basic reading formating
+INFO  [2022-09-04 11:21:09] Info_message:reading dataset
+INFO  [2022-09-04 11:21:09] Info_message:basic reading formating
+INFO  [2022-08-26 23:45:00] Info_message:reading dataset
+INFO  [2022-08-26 23:45:00] Info_message:basic reading formating
+INFO  [2022-08-26 23:49:34] Info_message:reading dataset
+INFO  [2022-08-26 23:49:34] Info_message:basic reading formating
+INFO  [2022-09-04 10:01:53] Info_message:reading dataset
+INFO  [2022-09-04 10:01:53] Info_message:basic reading formating
+INFO  [2022-09-04 10:52:34] Info_message:reading dataset
+INFO  [2022-09-04 10:52:34] Info_message:basic reading formating
+INFO  [2022-09-04 11:21:09] Info_message:reading dataset
+INFO  [2022-09-04 11:21:09] Info_message:basic reading formating
+INFO  [2022-09-04 19:06:00] Info_message:reading dataset
+INFO  [2022-09-04 19:06:00] Info_message:basic reading formating

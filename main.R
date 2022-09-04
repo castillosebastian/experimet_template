@@ -2,7 +2,7 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, data.table, dtplyr, log4r,
                lubridate, Rcpp, yaml, rlist, ggplot2, 
-               ROCR, methods, Matrix, caret)
+               ROCR, methods, Matrix, caret, rsample, tidymodels)
 options(scipen = 999)
 
 # logs
