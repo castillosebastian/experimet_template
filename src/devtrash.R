@@ -13,3 +13,10 @@ EXP  <- yaml::read_yaml( paste0(EXP_DIR,"/", args[1], ".yml") )
 EXP$experiment$name  <- args[1]
 PARAM  <- EXP$param
   
+
+set.seed(314)
+split <-  rsample::initial_split(data = data, strata = resultado,    prop = 0.8)
+train <- training(split)
+test  <- testing(split)
+
+

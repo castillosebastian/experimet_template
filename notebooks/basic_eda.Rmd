@@ -223,7 +223,6 @@ lightgbm_model<-
   parsnip::boost_tree(
     mode = "regression",
     trees = 1000,
-    learn_rate = 0.01,
     min_n = tune(),
     tree_depth = tune()#,
     #loss_reduction = tune(),
@@ -292,14 +291,60 @@ lgbm_test_preds_tun <- collect_predictions(lgbm_final_fit_tun)
 lgbm_test_preds_tun %>% 
   conf_mat_plot(null_model = F, colclass = resultado)
 ```
+
 ```{r}
-# https://www.r-bloggers.com/2020/08/how-to-use-lightgbm-with-tidymodels/
-# quedó en Find the best model from tuning results
+# roc curve
+covid_roc_curve <- lgbm_test_preds_tun %>% roc_curve(resultado, `.pred_1`)
+autoplot(covid_roc_curve)
 ```
 
 
 
+```{r}
+autoplot(lgbm_tuned)
+```
 
+# select the best parameter combination for a metric
+
+```{r}
+lgbm_best_params <- lgbm_tuned %>%
+  tune::select_best('accuracy')
+
+```
+
+# inalize the lgbm model to use the best tuning parameters.
+
+```{r}
+lgbm_model_final <-lightgbm_model %>%
+  finalize_model(lgbm_best_params)
+```
+
+# Sumision Predict
+
+
+```{r}
+
+sub = readRDS(paste0(RAW_DATA_DIR, "/covid_utn2022_unknown.rds"))
+
+lgbm_final_tun <- lgbm_final_wflow_tun %>% fit(covidtrain) 
+
+sub$resultado <- predict(lgbm_final_tun, covidtest)$`.pred_class`
+
+write_csv(sub, "submission.csv")
+
+
+preds <- predict(lgbm_mod, data = x_test)
+    
+    # set up submission frame
+    sub <- data.table(
+        MachineIdentifier = id_test,
+        HasDetections = preds
+    )
+
+
+
+
+```
 
 
 
