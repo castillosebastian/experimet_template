@@ -18,8 +18,8 @@ pacman::p_load(treesnip)
 pacman::p_load(doParallel)
 
 # speed up computation with parallel processing
-all_cores <- parallel::detectCores(logical = FALSE)
-registerDoParallel(cores = all_cores)
+# all_cores <- parallel::detectCores(logical = FALSE)
+# registerDoParallel(cores = all_cores)
 # set the random seed so we can reproduce any simulated results.
 set.seed(1234)
 # load the housing data and clean names
@@ -91,4 +91,82 @@ lgbm_tuned <- tune::tune_grid(
   # in what step of the process you are. But that doesn't look that well in
   # a blog.
 )
+
+#Find the best model from tuning results
+lgbm_tuned %>%
+  tune::show_best(metric = "rmse",n = 5)
+
+# plot the performance per parameter.
+lgbm_tuned %>%
+  tune::show_best(metric = "rmse",n = 10) %>%
+  tidyr::pivot_longer(min_n:tree_depth, names_to="variable",values_to="value" ) %>% 
+  ggplot(aes(value,mean)) +
+  geom_line(alpha=1/2)+
+  geom_point()+
+  facet_wrap(~variable,scales = "free")+
+  ggtitle("Best parameters for RMSE")
+
+# Since we asked for multiple metrics we can see the best performance for different metrics too.
+
+lgbm_tuned %>%
+  tune::show_best(metric = "mae",n = 10) %>%
+  tidyr::pivot_longer(min_n:tree_depth, names_to="variable",values_to="value" ) %>%
+  ggplot(aes(value,mean)) +
+  geom_line(alpha=1/2)+
+  geom_point()+
+  facet_wrap(~variable,scales = "free")+
+  ggtitle("Best parameters for MAE")
+
+#Than we can select the best parameter combination for a metric, or do it manually.
+
+lgbm_best_params <-
+  lgbm_tuned %>%
+  tune::select_best("rmse")
+
+# Finalize the lgbm model to use the best tuning parameters.
+lgbm_model_final <-
+  lightgbm_model%>%
+  finalize_model(lgbm_best_params)
+
+lgbm_model_final
+
+
+# falta entrenamiento final con todo los datos
+#################################################################
+
+
+# And evaluate on test data (yardstick)
+test_processed <- bake(preprocessing_recipe, new_data = testing(ames_split))
+test_prediction <-
+  trained_model_all_data %>%
+  # use the training model fit to predict the test data
+  predict(new_data = test_processed) %>%
+  bind_cols(testing(ames_split))
+
+# measure the accuracy of our model on training set (overestimation)
+train_prediction %>%
+  yardstick::metrics(sale_price, .pred) %>%
+  mutate(.estimate = format(round(.estimate, 2), big.mark = ",")) %>%
+  knitr::kable()
+
+# measure the accuracy of our model on data it hasn’t seen before (testset)
+test_prediction %>%
+  yardstick::metrics(sale_price, .pred) %>%
+  mutate(.estimate = format(round(.estimate, 2), big.mark = ",")) %>%
+  knitr::kable()
+
+# look at residuals
+house_prediction_residual <- test_prediction %>%
+  arrange(.pred) %>%
+  mutate(residual_pct = (sale_price - .pred) / .pred) %>%
+  select(.pred, residual_pct)
+
+ggplot(house_prediction_residual, aes(x = .pred, y = residual_pct)) +
+  geom_point() +
+  xlab("Predicted Sale Price") +
+  ylab("Residual (%)") +
+  scale_x_continuous(labels = scales::dollar_format()) +
+  scale_y_continuous(labels = scales::percent)
+
+
 
