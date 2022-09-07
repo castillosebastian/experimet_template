@@ -53,9 +53,65 @@ conf_mat_plot <- function(x, null_model = FALSE, colclass){
 
 ```
 
+# View Dataset
 
 ```{r}
 skimr::skim(data)
+```
+
+# data formating
+
+```{r}
+# date_cols <- c("fini_sintomas", "finternacion", "fdiag_covid")
+# setDT(data)[, (date_cols) := lapply(.SD, lubridate::ymd), .SDcols = date_cols]
+# setDT(data)[, (date_cols) := lapply(.SD, format, "%Y%m"), .SDcols = date_cols]
+# setDT(data)[, (date_cols) := lapply(.SD, as.numeric), .SDcols = date_cols]
+```
+
+```{r}
+data[ , resultado := as.factor(resultado)]
+```
+
+```{r}
+data %>% 
+  #sample_n(100) %>% 
+  visdat::vis_dat()
+```
+
+```{r}
+data %>% 
+  #sample_n(100) %>% 
+  visdat::vis_miss()
+```
+
+```{r}
+data %>%
+  inspectdf::inspect_na() %>% 
+  inspectdf::show_plot()
+```
+
+
+```{r}
+data[, c("ldh", "progr_imagerad_perc"):=NULL]  # remove two columns
+```
+
+
+```{r}
+data %>% 
+  naniar::gg_miss_upset()
+```
+
+```{r}
+data %>% as_tibble() %>% 
+  select_if(is.numeric) %>% 
+  visdat::vis_cor()
+```
+
+```{r}
+data %>% as_tibble() %>%
+  select_if(~!is.numeric(.)) %>%
+  inspectdf::inspect_cat() %>% 
+  inspectdf::show_plot()
 ```
 
 # Factor class
@@ -252,32 +308,6 @@ lgbm_best_params <- lgbm_tuned %>%
 lgbm_model_final <-lightgbm_model %>%
   finalize_model(lgbm_best_params)
 ```
-
-<!-- # Sumision Predict -->
-
-<!-- ```{r} -->
-
-<!-- sub = readRDS(paste0(RAW_DATA_DIR, "/covid_utn2022_unknown.rds")) -->
-
-<!-- lgbm_final_tun <- lgbm_final_wflow_tun %>% fit(covidtrain)  -->
-
-<!-- sub$resultado <- predict(lgbm_final_tun, covidtest)$`.pred_class` -->
-
-<!-- write_csv(sub, "submission.csv") -->
-
-
-<!-- preds <- predict(lgbm_mod, data = x_test) -->
-
-<!--     # set up submission frame -->
-<!--     sub <- data.table( -->
-<!--         MachineIdentifier = id_test, -->
-<!--         HasDetections = preds -->
-<!--     ) -->
-
-
-
-
-<!-- ``` -->
 
 
 

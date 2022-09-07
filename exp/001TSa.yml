@@ -64,7 +64,7 @@ param:
 
   files:
     input:
-      dentrada: [ "dataset" ]
+      dentrada: [ "dataset_growth6.csv.gz" ]
     output:
       future_data:   "TS_future_data.csv.gz"
       train_strategy: "TS_train_strategy.csv.gz"

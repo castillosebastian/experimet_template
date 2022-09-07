@@ -448,7 +448,7 @@ fganancia_lgbm_meseta  <- function(probs, datos) {
 
 GVEZ <- 1 
 
-CanaritosImportancia  <- function( canaritos_ratio = 0.2, año_mes_excludios_train = NULL, valido_en =  NULL) {
+CanaritosImportancia  <- function( canaritos_ratio = 0.2) {
   
   # Canaritos es una funciòn muy importante porque limpia el dataset de variables sin valor. Para ello, 
   # entrena un modelo GBDT, evalùa sus resultados y eliminar todas aquellas columnas con menor importancia que 
@@ -673,9 +673,7 @@ for( i in 1:length( PARAM$tendenciaYmuchomas$correr ) ) {
                         ratiomax=  PARAM$tendenciaYmuchomas$ratiomax[i]     )
     
     #elimino las variables poco importantes, para hacer lugar a las importantes
-    if( PARAM$tendenciaYmuchomas$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio = unlist(PARAM$tendenciaYmuchomas$canaritos[i], 
-                                                                                                      año_mes_excludios_train = PARAM$canaritos$meses_excluidos, 
-                                                                                                      valido_en =  PARAM$canaritos$meses_validacion))
+    if( PARAM$tendenciaYmuchomas$canaritos[ i ] > 0 )  CanaritosImportancia( canaritos_ratio = unlist(PARAM$tendenciaYmuchomas$canaritos[i]))
   }
 }
 
@@ -724,6 +722,6 @@ fwrite( dataset,
         logical01= TRUE,
         sep= "," )
 
-log4r_info(paste0(EXP$experiment$name, ": end experiment. Dataset de entrada con filas = ", dim(dataset)[1], 
+log4r_info(paste0(EXP$experiment$name, ": end experiment. Dataset de salida con filas = ", dim(dataset)[1], 
                   ", columnas = " , dim(dataset)[2], ". Rscript=", EXP$experiment$script ))
 

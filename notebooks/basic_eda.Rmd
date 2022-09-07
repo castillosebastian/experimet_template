@@ -95,7 +95,6 @@ data[, c("ldh", "progr_imagerad_perc"):=NULL]  # remove two columns
 ```
 
 
-
 ```{r}
 data %>% 
   naniar::gg_miss_upset()
