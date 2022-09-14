@@ -2,7 +2,7 @@
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, data.table, dtplyr, log4r,
                lubridate, Rcpp, yaml, rlist, ggplot2, 
-               ROCR, methods, Matrix, caret, rsample, tidymodels)
+               ROCR, methods, Matrix, caret, rsample)
 options(scipen = 999)
 
 # logs
@@ -48,4 +48,4 @@ exp_start  <- function( exp_nombre = NA) {
 # my_logfile <- as_tibble(readLines(my_logfile))
 # fwrite(my_logfile, paste0(LOGS_DIR, "/logs.txt"), append = T, sep= "\t")
 
-
+exp_start("001FEa")

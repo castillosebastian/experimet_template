@@ -1,0 +1,50 @@
+# lag1, delta1, tendencia6, promedio6
+# Ratios, trends y promedios 6, 3 y 12
+
+experiment:
+  script: "01_FE_covid.R"
+  restart: FALSE
+  name: "covid_01a"
+  type: "FeatureEngineering"
+  tags: [ "base" ]
+  description: "FE para Covid"
+
+  requires: 
+
+
+param:
+  dummiesNA: FALSE  #si la variable tiene nulos, agrega una variable dummy que indica +[0,1] si es nulo o no
+
+  corregir: "NO"     #  Repara las variables rotas { "NO", "ClaudioCastillo", "AsignarNA" }
+  variablesdrift: [ ] #Variables a aeliminar
+  
+  variablesmanuales: TRUE   #NO SE AGREGAN VARIABLES MANUALES
+  
+  randomforest:
+    correr: TRUE
+    num.trees: 3
+    max.depth: 100
+    min.node.size: 2000
+    mtry: 6
+
+  canaritos_final: 0.3   #si es CERO entonces no hace el filtrado final por canaritos
+
+  files:
+    input:
+      dentrada: [ "covid_utn2022.rds" ]
+      sinclase: "covid_utn2022_unknown.rds"
+    output:
+      dsalida: "covidresultado.csv.gz"
+
+  const:
+    lab_clase:     "resultado"
+    clase:         "resultado"
+    campos_sort:   [ "codigo_paciente" ]   #por donde hago el sort inicial, SACAMOS EL FOTO_MES porq no tenemos, o SI???
+    campos_rsort:  [ "codigo_paciente" ]   #por donde hago el sort inicial, SACAMOS EL FOTO_MES porq no tenemos, o SI???
+    campos_fijos:  [ "codigo_paciente", "resultado" ] # entendemos que no hay otros campos fijos... ok???
+
+
+environment:
+  base_dir: "/Volumes/GoogleDrive/Mi unidad/99yo/teach/DMCT-UTN/DMCT-UTN2022/datos/covid" #SABEMOS QUE TENEMOS Q CAMBIAR, DSPS lo HACEMOS
+  repo_dir: "./datasets"
+  exp_dir:  "./exp/01_FE"

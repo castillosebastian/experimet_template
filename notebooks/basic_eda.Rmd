@@ -9,9 +9,50 @@ output:
 ---
 
 ```{r}
+# https://www.kaggle.com/code/gomes555/tps-apr2021-r-eda-lightgbm-bayesopt
 source(paste0(here::here(), "/main.R"))
-source(paste0(HOME_DIR,"/src/scripts/data_processing/process_raw_data.R"))
+require("tidymodels")
+data = fread(paste0(PROCESSED_DATA_DIR, "/dataset_growth4.csv.gz"))
 ```
+
+```{r}
+conf_mat_plot <- function(x, null_model = FALSE, colclass){
+  require(patchwork)
+  
+  trs <- 0.5
+  
+  if(null_model==FALSE){
+    x <- x %>% 
+      mutate(.pred_class = ifelse(.pred_1 >= trs, 1, 0) %>%
+               factor())  
+  }
+  
+  p1 <- 
+    x %>%
+    select(.pred_class, {{colclass}}) %>%
+    table() %>% 
+    conf_mat() %>% 
+    autoplot(type = "heatmap")+
+    labs(title = "Confusion Matrix",
+         subtitle = paste0("Threshold: ", round(trs, 4)))
+  
+  p2 <- 
+    x  %>%
+    ggplot() +
+    geom_density(aes(x = .pred_1, fill = {{colclass}}), 
+                 alpha = 0.5)+
+    labs(title = "Predicted probability distributions",
+         subtitle = "by target")+ 
+    scale_x_continuous(limits = 0:1)+
+    geom_vline(aes(xintercept = trs, color = "threshold"), linetype = 2) +
+    scale_color_manual(name = "", values = c(`threshold` =  "red"))+
+    scale_fill_viridis_d(end = 0.7, direction = 1)
+  
+  p1 | p2
+}
+
+```
+
 
 ```{r}
 skimr::skim(data)
@@ -20,10 +61,10 @@ skimr::skim(data)
 
 
 ```{r}
-date_cols <- c("fini_sintomas", "finternacion", "fdiag_covid")
-setDT(data)[, (date_cols) := lapply(.SD, lubridate::ymd), .SDcols = date_cols]
-setDT(data)[, (date_cols) := lapply(.SD, format, "%Y%m"), .SDcols = date_cols]
-setDT(data)[, (date_cols) := lapply(.SD, as.numeric), .SDcols = date_cols]
+# date_cols <- c("fini_sintomas", "finternacion", "fdiag_covid")
+# setDT(data)[, (date_cols) := lapply(.SD, lubridate::ymd), .SDcols = date_cols]
+# setDT(data)[, (date_cols) := lapply(.SD, format, "%Y%m"), .SDcols = date_cols]
+# setDT(data)[, (date_cols) := lapply(.SD, as.numeric), .SDcols = date_cols]
 ```
 
 ```{r}
@@ -35,6 +76,7 @@ data %>%
   #sample_n(100) %>% 
   visdat::vis_dat()
 ```
+
 ```{r}
 data %>% 
   #sample_n(100) %>% 
@@ -46,10 +88,11 @@ data %>%
   inspectdf::inspect_na() %>% 
   inspectdf::show_plot()
 ```
-```{r}
-data[, c("metodo_otro","no_neumonia_cual", "progr_imagerad_perc"):=NULL]  # remove two columns
-```
 
+
+```{r}
+data[, c("ldh", "progr_imagerad_perc"):=NULL]  # remove two columns
+```
 
 
 ```{r}
@@ -58,80 +101,14 @@ data %>%
 ```
 
 ```{r}
-data %>% 
+data %>% as_tibble() %>% 
   select_if(is.numeric) %>% 
   visdat::vis_cor()
 ```
 
 ```{r}
-data %>%
+data %>% as_tibble() %>%
   select_if(~!is.numeric(.)) %>%
   inspectdf::inspect_cat() %>% 
   inspectdf::show_plot()
 ```
-
-# Null Model
-
-```{r}
-#https://www.tidymodels.org/start/recipes/
-
-set.seed(314)
-
-split <- initial_split(data = data, strata = resultado, prop = 0.8)
-train <- training(split)
-test  <- testing(split)
-
-folds <- train %>% rsample::vfold_cv(v = 4,repeats = 2, strata = resultado)
-
-recipe <- recipe(resultado ~ ., data = train) %>%
-  update_role(codigo_paciente, new_role = "ID") %>% 
-  # step_medianimpute(all_predictors())
-  # step_date(finternacion, features = c("dow", "month")) %>%               
-  # step_holiday(finternacion, 
-  #              holidays = timeDate::listHolidays("Argentina"),
-  #              keep_original_cols = FALSE) %>%
-  step_dummy(all_nominal_predictors()) %>% 
-  #step_impute_linear(all_predictors()) %>% 
-  step_dummy(all_nominal_predictors()) %>% 
-  step_zv(all_predictors())
-  
-```
-
-```{r}
-lr_mod <- 
-  logistic_reg() %>% 
-  set_engine("glm")
-```
-
-```{r}
-wflow <- 
-  workflow() %>% 
-  add_model(lr_mod) %>% 
-  add_recipe(recipe)
-```
-
-```{r}
-fit <- 
-  wflow %>% 
-  fit(data = train)
-```
-```{r}
-fit %>% 
-  extract_fit_parsnip() %>% 
-  tidy()
-```
-```{r}
-predict(fit, test)
-```
-```{r}
-aug <- augment(fit, test)
-
-# The data look like: 
-aug %>% select(resultado, .pred_class)
-```
-```{r}
-aug %>% 
-  roc_curve(truth = resultado, .pred_class) %>% 
-  autoplot()
-```
-

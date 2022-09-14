@@ -1,0 +1,29 @@
+
+experiment:
+  name: "exp"
+  type: "TrainingStrategy"
+  tags: [ "marketing" ]
+  requires: "./exp/01_FE/covid_01a/" # Aca poner la carpeta de la FE que necesite
+
+
+param:
+  semilla: 102191
+  undersampling: [  ]
+
+  files:
+    input:
+      dentrada: [ "covidresultado.csv.gz" ] # Aca va el dataset de origen
+    output:
+      future_data:   "TS_future_data.csv.gz"
+      train_strategy: "TS_train_strategy.csv.gz"
+      control:       "control.txt"
+
+  const:
+    secciones: [ "future", "train"  ]
+    clase: "resultado"
+    campos_sort:  [ "codigo_paciente" ]   #por donde hago el sort inicial
+
+
+environment:
+  base_dir: "/Volumes/GoogleDrive/Mi unidad/99yo/teach/DMCT-UTN/DMCT-UTN2022/datos/covid" #SABEMOS QUE TENEMOS Q CAMBIAR, DSPS lo HACEMOS
+  exp_dir:  "./exp/02_TS/covid_01a/"
