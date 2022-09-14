@@ -1,0 +1,35 @@
+---
+title: "predicciones1"
+author: "Sebastian Castillo"
+date: "2022-09-13"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+source(paste0(here::here(), "/main.R"))
+source(paste0(HOME_DIR,"/src/completo/predicciones1.R"))
+```
+
+# Predicciones1
+
+##  Summary Diagnostics
+
+```{r}
+monthly_retail_tbl %>%
+  group_by(Industry) %>%
+  tk_summary_diagnostics(.date_var = Month)
+```
+
+## Quick Visualization 
+
+```{r}
+groups_fe_tbl %>% 
+  filter(Industry == Industries[1]) %>%
+  mutate(Month = as.numeric(Month)) %>% 
+  select_if(is.numeric) %>% 
+  plot_time_series_regression(.date_var = Month, 
+                              .formula = Turnover ~ .,
+                              .show_summary = TRUE)
+```
+
