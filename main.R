@@ -48,4 +48,4 @@ exp_start  <- function( exp_nombre = NA) {
 # my_logfile <- as_tibble(readLines(my_logfile))
 # fwrite(my_logfile, paste0(LOGS_DIR, "/logs.txt"), append = T, sep= "\t")
 
-exp_start("001FEa")
+#exp_start("001FEa")
